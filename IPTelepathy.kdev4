@@ -1,0 +1,4 @@
+[Project]
+Name=IPTelepathy
+Manager=KDevCMakeManager
+VersionControl=kdevgit
