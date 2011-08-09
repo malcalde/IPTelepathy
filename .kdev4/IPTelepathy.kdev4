@@ -1,0 +1,15 @@
+[Buildset]
+BuildItems=@Variant(\x00\x00\x00\t\x00\x00\x00\x00\x01\x00\x00\x00\x0b\x00\x00\x00\x00\x01\x00\x00\x00\x16\x00I\x00P\x00T\x00e\x00l\x00e\x00p\x00a\x00t\x00h\x00y)
+
+[CMake]
+BuildDirs=/home/malcalde/Development/kdevelop.workspace/IPTelepathy/build
+CMakeDir=/usr/share/cmake-2.8/Modules
+Current CMake Binary=file:///usr/bin/cmake
+CurrentBuildDir=file:///home/malcalde/Development/kdevelop.workspace/IPTelepathy/build
+CurrentBuildType=Debug
+CurrentInstallDir=file:///usr
+Extra Arguments=
+ProjectRootRelative=./
+
+[Project]
+VersionControlSupport=kdevgit
