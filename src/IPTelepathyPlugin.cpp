@@ -16,12 +16,14 @@
     along with this program.  If not, see <http://www.gnu.org/licenses/>.
 */
 
+#include <boost/thread/thread.hpp>
 #include <telepathy-glib/telepathy-glib.h>
 
-#include "IPTelepathyPlugin.h"
 #include "P4HPlugin.h"
 #include "P4HEventManager.h"
 #include "P4HTools.h"
+
+#include "IPTelepathyPlugin.h"
 
 using namespace P4H;
 
@@ -30,6 +32,7 @@ const String sPluginName = "IPTelepathy";
 static GMainLoop* tp_loop = NULL;
 static TpDBusDaemon* tp_bus= NULL;
 static TpConnection* tp_conn = NULL;
+static GError *g_error = NULL;
 
 //---------------------------------------------------------------------------
 // Telepathy funcions (implementation)
@@ -49,10 +52,28 @@ static void tp_got_connection_managers (
     GObject        *weak_object
 );
 
+struct _threadLoop
+{
+    void operator()()
+    {
+        if (!tp_loop)
+        {
+            P4H_LOG("[IPTelepathyPlugin - _threadLoop] Starting telepathy loop");
+            g_main_loop_run (tp_loop);
+        }
+        else
+            P4H_LOG("[IPTelepathyPlugin - _threadLoop] No DBUS conection!.");
+    }
+} threadLoop;
+
 //---------------------------------------------------------------------------
 // IPTelepathyPlugin methods
 //---------------------------------------------------------------------------
 IPTelepathyPlugin::IPTelepathyPlugin()
+{
+}
+//---------------------------------------------------------------------------
+IPTelepathyPlugin::~IPTelepathyPlugin()
 {
 }
 //---------------------------------------------------------------------------
@@ -65,6 +86,8 @@ bool IPTelepathyPlugin::onInstall()
 {
     P4H_LOG( String("*-*-*-*-*-*IPTelepathyPlugin: install"));
 
+    g_type_init();
+    
     return true;
 }
 //---------------------------------------------------------------------------
@@ -80,6 +103,17 @@ bool IPTelepathyPlugin::onInitialise()
         )
     );
 
+    /* create a main loop */
+    tp_loop = g_main_loop_new(NULL, FALSE);
+    
+    /* acquire a connection to the D-Bus daemon */
+    tp_bus = tp_dbus_daemon_dup(&g_error);
+    if (tp_bus == NULL)
+    {
+        P4H_LOG("[IPTelepathyPlugin::initialise]{ERROR} " + String(g_error->message));
+        return false;
+    }
+    
     return true;
 }
 //---------------------------------------------------------------------------
@@ -87,6 +121,9 @@ bool IPTelepathyPlugin::onReInitialise()
 {
     P4H_LOG( "*-*-*-*-*-*IPTelepathyPlugin: reinitialise");
 
+    /* re-create a main loop */
+    if (! tp_loop)
+        tp_loop = g_main_loop_new(NULL, FALSE);
     return true;
 }
 //---------------------------------------------------------------------------
@@ -96,6 +133,13 @@ bool IPTelepathyPlugin::onShutdown()
 
     P4H_LOG( "*-*-*-*-*-*IPTelepathyPlugin: shutdown");
 
+    //Cerramos conexion
+    if (tp_conn)
+        tp_cli_connection_call_disconnect (tp_conn, -1, NULL, NULL, NULL, NULL);
+    
+    //Release D-BUS connection
+    g_object_unref(tp_bus);
+    
     return true;
 }
 //---------------------------------------------------------------------------
@@ -112,34 +156,11 @@ bool IPTelepathyPlugin::onExecute()
 {
     P4H_LOG( "*-*-*-*-*-*IPTelepathyPlugin: Execute");
 
-    //TODO (malcalde@ibit.org) De momento meto todo el codigo aqui a la espera de investigar posibilidades 
-    // de Boost::StateChart + Boost:Thread patterns
-    GError *error = NULL;
-    g_type_init ();
-    
-    /* create a main loop */
-    tp_loop = g_main_loop_new (NULL, FALSE);
-
-    /* acquire a connection to the D-Bus daemon */
-    tp_bus = tp_dbus_daemon_dup(&error);
-    if (tp_bus == NULL)
-        g_error ("%s", error->message);
-    
     /* Let's get a list of the connection managers */
     tp_list_connection_managers (tp_bus, tp_got_connection_managers,
             NULL, NULL, NULL);
-    
-//     /* we want to request the gabble CM */
-//     TpConnectionManager *cm = tp_connection_manager_new (tp_bus,"idle", NULL, &error);
-//     
-//     if (error) g_error ("%s", error->message);
-
-//     tp_connection_manager_call_when_ready (cm, 
-//                                            tp_connection_ready,
-//                                            argv, NULL, NULL);
-
-    g_main_loop_run (tp_loop);
-    g_object_unref (tp_bus);
+   
+    boost::thread thrd(threadLoop);
         
     return true;
 }

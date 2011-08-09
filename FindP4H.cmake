@@ -1,9 +1,10 @@
 FIND_PATH(P4H_INCLUDE_DIRS
   NAMES P4H.h
   HINTS
-  PATH_SUFFIXES include
+  PATH_SUFFIXES p4h p4h/P4HCore 
   PATHS
   /usr
+  /usr/include
   /usr/local
   /home/malcalde/Projects/rehab8/playforhealth/P4HCore
 )

@@ -2,5 +2,11 @@
  
  * Created plugin skeleton
  * Created FindP4H cmake module
-
+ * Created FindTELEPATHY cmake module
+ * Created FindGLIB_2_0 cmake module
+ * Created DBUS_GLIB_1 cmake module
+ 
+2011-09-09 Miguel Angel Alcalde Velado <miguel.wasabi@gmail.com>
+ * Added telepathy connection code
+ * Added 'dump telepathy connection manager'
 

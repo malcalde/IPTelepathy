@@ -20,8 +20,6 @@
 #ifndef IPTELEPATHYPLUGIN_H
 #define IPTELEPATHYPLUGIN_H
 
-#include <iostream>
-
 #include "P4H.h"
 #include "IPTelepathyPluginPrerequisites.h"
 
