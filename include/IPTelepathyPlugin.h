@@ -20,8 +20,14 @@
 #ifndef IPTELEPATHYPLUGIN_H
 #define IPTELEPATHYPLUGIN_H
 
+#include <iostream>
+
 #include "P4H.h"
 #include "IPTelepathyPluginPrerequisites.h"
+
+// static GMainLoop *loop = NULL;
+// static TpDBusDaemon *dbus_daemon = NULL;
+// static TpConnection *conn = NULL;
 
 /**
  * @addtogroup P4H

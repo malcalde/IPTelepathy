@@ -1,8 +1,0 @@
-usr/include/*
-usr/include/p4h/P4HInput/IPTelepathyPlugin/*.h
-
-#usr/lib/lib*.a
-#usr/lib/lib*.so
-#usr/lib/pkgconfig/*
-#usr/lib/*.la
-#usr/share/pkgconfig/*
